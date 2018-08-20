@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video 7</title>
+	<link href = "style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+	<div class="nav-bar"></div>
+	<div id = "app">
+		<div class="product">
+			<div class="product-image">
+				<img v-bind:src = "image"/><!-- computed property-->
+			</div>
+			<div class="priduct-info">
+				<h1> {{title}}</h1><!-- computed property(calculated), instead of data property(stored)-->
+				<ul>
+					<li v-for="i in details">{{i}}</li>
+				</ul>
+				<h4 v-if="inStock"> In Stock!</h4><!-- computed prop-->
+				<h4 v-else> Out of stock!</h4> 
+				<div v-for="(variant,index) in variants">
+				   <div class="color-box" :style = "{backgroundColor: variant.color}" v-on:mouseover="updateProduct(index)"></div> <!-- to use background-color, put it in '' -->
+				</div>
+				<button v-on:click="incrementCart" :disabled="!inStock" :class="{disabledButton: !inStock}">Add to Cart</button>
+				<button v-on:click="clearCart">Clear Cart</button>
+				<p v-show="inStock"> Cart {{cart}} </p>
+				<button v-show="inStock">Buy Now</button>
+			</div>
+			</div>
+		</div>
+<script src = "vue.js"></script>
+<script>
+	var app = new Vue({
+		el: '#app',
+		data: {
+			product: 'Socks',
+			brand: 'Vue Brand',
+			selectedVariant: 0,
+			cart: 0,
+			details: ['80% Cotton','20% Polyster','Gender-Neutral'],
+			variants: [
+			{
+              variantID: 456,
+              color: 'Green',
+              image: 'vmSocks-green-onWhite.jpg',
+              available: true
+			},
+			{
+              variantID: 123,
+              color: 'Blue',
+              image:'vmSocks-blue-onWhite.jpg',
+              available: false
+			}
+			]
+		},
+	    methods: {
+	    	incrementCart : function(){
+	    		this.cart+=1;
+	    	},
+	    	clearCart : function(){
+	    		this.cart = 0;
+	    	},
+	    	updateProduct :function(index){
+	    		this.selectedVariant = index;
+	    	}
+	    },
+	    computed: {
+	    	title: function(){
+	    		return this.brand+' '+this.product;	
+	    	},
+	    	image: function(){
+	    		return this.variants[this.selectedVariant].image;
+	    	},
+	    	inStock: function(){
+	    		return this.variants[this.selectedVariant].available;
+	    	}
+	    }
+	});
+</script>
+</body>
+</html>

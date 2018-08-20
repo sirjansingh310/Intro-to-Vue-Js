@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video 10</title>
+	<link href = "style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+	<div class="nav-bar"></div>
+	<div id = "app">
+	    <div class="cart"><p> Cart {{cart}} </p></div>
+		<product :premium="premium" v-on:add-to-cart="addItems" v-on:remove-from-cart=	"removeItems"></product>
+		<!--<product></product>
+		<product></product> we can reuse these components-->
+		</div>
+<script src = "vue.js"></script>
+<script>
+	Vue.component('product',{
+        props:{
+        	premium:{
+             type: Boolean,
+             required: true
+         	}
+        },
+		template:
+		    `<div class = "product">
+			<div class="product-image">
+				<img v-bind:src = "image"/><!-- computed property-->
+			</div>
+			<div class="priduct-info">
+				<h1> {{title}}</h1><!-- computed property(calculated), instead of data property(stored)-->
+				<ul>
+					<li v-for="i in details">{{i}}</li>
+				</ul>
+				<h4 v-if="inStock"> In Stock!</h4><!-- computed prop-->
+				<h4 v-else> Out of stock!</h4> 
+				<div v-for="(variant,index) in variants">
+				   <div class="color-box" :style = "{backgroundColor: variant.color}" v-on:mouseover="updateProduct(index)">
+				   </div> <!-- to use background-color, put it in '' -->
+				</div>
+				<button v-on:click="incrementCart" :disabled="!inStock" :class="{disabledButton: !inStock}">Add to Cart</button>
+				<button v-on:click="clearCart">Clear Cart</button>
+				<p> Shipping: {{shipping}} </p>
+				<button v-show="inStock">Buy Now</button>
+			</div>
+						<product-review></product-review>
+
+		    </div>
+		     `,
+		  data: function(){  //data property is function in components
+            return {
+			product: 'Socks',
+			brand: 'Vue Brand',
+			selectedVariant: 0,
+			details: ['80% Cotton','20% Polyster','Gender-Neutral'],
+			variants: [
+			{
+              variantID: 456,
+              color: 'Green',
+              image: 'vmSocks-green-onWhite.jpg',
+              available: true
+			},
+			{
+              variantID: 123,
+              color: 'Blue',
+              image:'vmSocks-blue-onWhite.jpg',
+              available: false
+			}
+			]
+		}
+	 },
+
+    methods: {
+	    	incrementCart : function(){
+	    		this.$emit('add-to-cart');// creating this event which will  invoke addItems method from vue instance(child to parent comm, opp of props)
+	    	},
+	    	clearCart : function(){
+	    		this.$emit('remove-from-cart');
+	    	},
+	    	updateProduct :function(index){
+	    		this.selectedVariant = index;
+	    	}
+	    },
+	    computed: {
+	    	title: function(){
+	    		return this.brand+' '+this.product;	
+	    	},
+	    	image: function(){
+	    		return this.variants[this.selectedVariant].image;
+	    	},
+	    	inStock: function(){
+	    		return this.variants[this.selectedVariant].available;
+	    	},
+	    	shipping: function(){
+	    		if(this.premium)
+	    			return 'Free';
+	    		else
+	    			return '$2.99';
+	    	}
+	    }
+	});
+	Vue.component('product-review',{
+         template: `<div class="product-review">
+         <div v-if="!reviews.length"><p>No reviews found</p></div>
+         <div v-else> 
+         <h4> Recent product reviews</h4>
+         <div v-for="r in reviews">
+         <p> <b>Name</b>: {{r.name}} </p>
+         <p> <b>Review</b>: {{r.review}} </p>
+         <p> <b>Rating</b>: {{r.rating}} </p>
+         </div>
+          </div>
+         <form class="review-form" v-on:submit.prevent="onSubmit">
+         <h4> Review this product</h4>	
+         <p class="error" v-if="errors.length">
+          <b>Please correct the following error(s):</b>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+        </p>
+          <p>
+            <label for="name">Name:</label>
+            <input id="name" v-model="name" placeholder="name"><!-- v-model provides 2 way binding. v-bind is static one way data binding-->
+            </p>
+      
+      <p>
+        <label for="review">Review:</label>      
+        <textarea id="review" v-model="review"></textarea>
+      </p>
+      
+      <p>
+        <label for="rating">Rating:</label>
+        <select id="rating" v-model.number="rating"> <!-- making sure the data type in num-->
+          <option>5</option>
+          <option>4</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
+        </select>
+        <br>
+        <p> Would you like to recommend this product to your friends?</p>
+        <label>Yes<input type = "radio" v-model="recommend" value="yes"></label>
+        <label> No<input type = "radio" v-model="recommend" value="no"></label>
+
+      </p>
+          
+      <p>
+        <input type="submit" value="Submit">  
+      </p>    
+    
+    </form>
+    </div>`
+   ,
+    data : function(){
+    	return {
+    		name: null,
+    		review: null,
+    		rating: null,
+    		recommend: null,
+    		reviews: [],
+    		errors: []
+    	}
+    },
+    methods: {
+     onSubmit: function(){
+     	  this.errors = []
+     	  if(this.name && this.review && this.rating &&this.recommend){
+          this.reviews.push({
+          	name: this.name,
+          	review: this.review,
+          	rating: this.rating,
+          	recommend: this.recommend
+          });
+          this.name = null;
+          this.review = null;
+          this.rating = null;
+          this.recommend= null;
+      }
+      else{
+      	if(!this.name)
+      		this.errors.push("Name not found");
+      	if(!this.review)
+      		this.errors.push("Review not found");
+      	if(!this.rating)
+      		this.errors.push("Rating not found");
+      	if(!this.recommend)
+      		this.errors.push("Recommendation not found");
+      }
+     }
+    }
+  
+	});
+	var app = new Vue({
+		el: '#app',
+		data: {// Vue instance is parent of our component
+          premium: true,// can be sent to components using props
+          cart: 0// so that all components share the same cart
+		},
+		methods:{
+           addItems: function(){
+           	this.cart+=1;
+           },
+           removeItems: function(){
+           	this.cart=0;
+           }
+		}
+	});
+
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Video 5</title>
+	<link href = "style.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+	<div class="nav-bar"></div>
+	<div id = "app">
+		<div class="product">
+			<div class="product-image">
+				<img v-bind:src = "image"/>
+			</div>
+			<div class="priduct-info">
+				<h1> {{product}}</h1>
+				<ul>
+					<li v-for="i in details">{{i}}</li>
+				</ul>
+				<h4 v-if="inStock"> In Stock!</h4>
+				<h4 v-else> Out of stock!</h4> 
+				<div v-for="variant in variants">
+					<p v-on:mouseover="changeImage(variant.image)">{{variant.color}}</p>
+				</div>
+				<button v-on:click="incrementCart">Add to Cart</button>
+				<button v-on:click="clearCart">Clear Cart</button>
+				<p> Cart {{cart}} </p>
+				<button v-show="inStock">Buy Now</button>
+			</div>
+			</div>
+		</div>
+<script src = "vue.js"></script>
+<script>
+	var app = new Vue({
+		el: '#app',
+		data: {
+			product: 'Socks',
+			image: 'vmSocks-green-onWhite.jpg',
+			inStock: true,
+			cart: 0,
+			details: ['80% Cotton','20% Polyster','Gender-Neutral'],
+			variants: [
+			{
+              variantID: 456,
+              color: 'Green',
+              image: 'vmSocks-green-onWhite.jpg'
+			},
+			{
+              variantID: 123,
+              color: 'Blue',
+              image:'vmSocks-blue-onWhite.jpg'
+			}
+			]
+		},
+	    methods: {
+	    	incrementCart : function(){
+	    		this.cart+=1;
+	    	},
+	    	clearCart : function(){
+	    		this.cart = 0;
+	    	},
+	    	changeImage :function(img){
+	    		this.image = img;
+	    	}
+	    }
+	});
+</script>
+</body>
+</html>
